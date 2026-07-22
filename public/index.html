@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>کافی کلیکر · آنلاین</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ====== استایل‌های مشابه قبل ====== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Vazirmatn','Segoe UI',sans-serif; }
+    body { min-height:100vh; background:radial-gradient(ellipse 900px 500px at 50% -10%, #3a2717 0%, transparent 60%), #1c130d; display:flex; justify-content:center; align-items:center; padding:32px 16px; }
+    .game-container { max-width:560px; width:100%; background:linear-gradient(180deg,#2c2015,#382a1a); border:1px solid #4a382490; border-radius:18px; padding:28px; box-shadow:0 20px 40px -20px #00000090, inset 0 1px 0 #ffffff08; }
+    h1 { text-align:center; color:#e8b45c; font-weight:900; font-size:2.2rem; display:flex; align-items:center; justify-content:center; gap:10px; }
+    h1::before { content:"☕"; font-size:2rem; }
+    .server-badge { background:#3a2a15; border-radius:30px; padding:3px 16px; font-size:12px; color:#c2ac8c; display:inline-block; margin-bottom:8px; border:1px solid #4a382490; }
+    .online-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#6fbf73; margin-left:6px; }
+    .tabs { display:flex; gap:6px; margin:16px 0; background:#241a12; padding:4px; border-radius:12px; }
+    .tab { flex:1; text-align:center; padding:10px 0; border-radius:9px; cursor:pointer; font-weight:700; font-size:14px; color:#c2ac8c; transition:all .2s; }
+    .tab.active { background:#d98e4a; color:#241505; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    #register-area { background:#241a12; padding:20px; border-radius:12px; margin-bottom:16px; border:1px solid #4a382490; }
+    #register-area h3 { color:#e8b45c; margin-bottom:12px; text-align:center; }
+    #register-area p { color:#c2ac8c; font-size:13px; text-align:center; margin-bottom:8px; }
+    #register-area input { width:100%; padding:10px; border-radius:8px; border:1px solid #4a382490; background:#1c130d; color:#f3e7d3; font-size:15px; margin-top:6px; }
+    #register-area button { margin-top:12px; width:100%; }
+    .stats { background:#241a12; padding:18px 12px; border-radius:12px; margin:20px 0; display:flex; flex-wrap:wrap; justify-content:space-around; align-items:center; color:#f3e7d3; font-weight:bold; border:1px solid #4a382490; }
+    .stats span { background:#1c130d; padding:6px 18px; border-radius:8px; font-size:1.2rem; min-width:70px; text-align:center; color:#e8b45c; }
+    .cup-zone { position:relative; height:190px; display:flex; align-items:flex-end; justify-content:center; }
+    .steam { position:absolute; bottom:118px; left:50%; transform:translateX(-50%); pointer-events:none; z-index:1; }
+    .steam path { stroke:#c2ac8c; stroke-width:3; fill:none; stroke-linecap:round; opacity:0; }
+    .steam .s1 { animation:steam 2.6s ease-in infinite; }
+    .steam .s2 { animation:steam 2.6s ease-in infinite .9s; }
+    .steam .s3 { animation:steam 2.6s ease-in infinite 1.8s; }
+    @keyframes steam { 0%{opacity:0;transform:translateY(0) scaleX(1);} 30%{opacity:.55;} 100%{opacity:0;transform:translateY(-34px) scaleX(1.5);} }
+    .coffee-btn { background:none; border:none; cursor:pointer; padding:0; width:150px; height:150px; position:relative; z-index:2; transition:transform .08s; outline:none; }
+    .coffee-btn:active { transform:scale(.9) rotate(-2deg); }
+    .coffee-btn:focus-visible { outline:2px solid #e8b45c; outline-offset:6px; border-radius:50%; }
+    .coffee-btn.disabled { opacity:0.5; filter:grayscale(0.6); transform:scale(0.95); pointer-events:none; }
+    .cooldown-text { font-size:.9rem; background:#241a12; padding:2px 18px; border-radius:60px; color:#c2ac8c; display:inline-block; }
+    .abilities { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:25px 0 18px; }
+    .ability-card { background:#2c2015; padding:12px 14px; border-radius:12px; flex:1 1 130px; text-align:center; border:1px solid #4a382490; color:#f3e7d3; font-weight:700; }
+    .ability-card button { background:linear-gradient(180deg,#e8b45c,#d98e4a); border:none; padding:8px 18px; border-radius:8px; font-weight:800; margin-top:8px; cursor:pointer; transition:.05s linear; font-size:.9rem; width:100%; color:#241505; box-shadow:0 3px 0 #a06f3a; }
+    .ability-card button:active { transform:translateY(3px); box-shadow:0 0 0 #a06f3a; }
+    .ability-card button:disabled { opacity:.5; transform:translateY(3px); box-shadow:0 0 0 #a06f3a; pointer-events:none; }
+    .reset-area { text-align:center; margin-top:12px; }
+    .reset-area button { background:#2c2015; border:1px solid #4a382490; padding:8px 32px; border-radius:8px; color:#c2ac8c; font-weight:bold; cursor:pointer; }
+    .reset-area button:active { transform:scale(.96); }
+    .footer { text-align:center; margin-top:8px; color:#c2ac8c; font-size:.8rem; }
+    .footer a { color:#e8b45c; text-decoration:none; font-weight:700; }
+    .footer a:hover { text-decoration:underline; }
+    .leaderboard { background:#241a12; padding:14px; border-radius:12px; margin:12px 0; border:1px solid #4a382490; }
+    .leaderboard h3 { color:#e8b45c; text-align:center; margin-bottom:10px; }
+    .lb-item { display:flex; justify-content:space-between; background:#1c130d; padding:4px 18px; border-radius:8px; font-size:.9rem; border-right:4px solid #d98e4a; margin-bottom:4px; }
+    .lb-item span:first-child { font-weight:600; color:#e8b45c; }
+    .lb-item .clicks { color:#c2ac8c; }
+    .my-rank { text-align:center; margin-top:10px; padding:6px 12px; background:#1c130d; border-radius:8px; font-size:13px; color:#c2ac8c; border:1px dashed #4a382490; }
+    .my-rank strong { color:#e8b45c; }
+    .hidden { display:none !important; }
+    .error-msg { color:#d17a5e; background:#3a1f18; padding:8px 12px; border-radius:8px; margin-top:8px; display:none; }
+    .error-msg.show { display:block; }
+    .primary { width:100%; margin-top:12px; padding:13px; border:none; border-radius:10px; background:linear-gradient(180deg,#e8b45c,#d98e4a); color:#241505; font-weight:800; font-size:15px; cursor:pointer; transition:transform .1s; }
+    .primary:active { transform:scale(.98); }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <h1>کافی کلیکر</h1>
+  <div style="text-align:center;"><span class="server-badge"><span class="online-dot"></span> آنلاین · Redis</span></div>
+
+  <!-- ===== ثبت‌نام ===== -->
+  <div id="register-area">
+    <h3>👤 ثبت‌نام با نام کاربری</h3>
+    <p>یک نام برای خود انتخاب کنید. این نام در لیدربورد نمایش داده می‌شود.</p>
+    <input type="text" id="usernameInput" placeholder="نام کاربری" maxlength="20" />
+    <button class="primary" id="registerBtn">ثبت نام</button>
+    <div class="error-msg" id="registerError"></div>
+    <div id="registeredInfo" class="hidden" style="color:#93ab7d; text-align:center; margin-top:8px;">
+      ✅ شما با نام <span id="displayName"></span> ثبت‌نام کردید.
+    </div>
+  </div>
+
+  <!-- ===== تب‌ها ===== -->
+  <div class="tabs">
+    <div class="tab active" data-tab="game">☕ بازی</div>
+    <div class="tab" data-tab="leaderboard">🏆 لیدربورد</div>
+  </div>
+
+  <!-- ===== تب بازی ===== -->
+  <div id="tab-game" class="tab-content active">
+    <div class="stats">
+      <span id="coffeeDisplay">0</span> <span>☕</span>
+      <span id="clickPowerDisplay">1</span> <span>⚡</span>
+    </div>
+    <div style="text-align:center;">
+      <div class="cup-zone">
+        <svg class="steam" width="60" height="60" viewBox="0 0 60 60">
+          <path class="s1" d="M20 55 C15 45,25 40,20 30 C15 20,25 15,22 5"/>
+          <path class="s2" d="M32 55 C27 45,37 40,32 30 C27 20,37 15,34 5"/>
+          <path class="s3" d="M44 55 C39 45,49 40,44 30 C39 20,49 15,46 5"/>
+        </svg>
+        <button class="coffee-btn" id="coffeeBtn" aria-label="کلیک">
+          <svg viewBox="0 0 150 150" width="150" height="150">
+            <ellipse cx="75" cy="130" rx="55" ry="8" fill="#00000040"/>
+            <path d="M30 55 h75 v40 a37.5 37.5 0 0 1-37.5 37.5h-0 A37.5 37.5 0 0 1 30 95 Z" fill="#e8b45c" stroke="#8a5a3a" stroke-width="3"/>
+            <path id="liquid" d="M36 61 h63 v30 a31.5 31.5 0 0 1-31.5 31.5 A31.5 31.5 0 0 1 36 91 Z" fill="#5c3a20"/>
+            <path d="M105 62 h8 a14 14 0 0 1 0 28 h-8" fill="none" stroke="#8a5a3a" stroke-width="6"/>
+            <ellipse cx="67.5" cy="55" rx="37.5" ry="7" fill="#3a2717"/>
+          </svg>
+        </button>
+      </div>
+      <div><span class="cooldown-text" id="cooldownStatus">✅ آماده</span></div>
+    </div>
+
+    <div class="abilities">
+      <div class="ability-card"><div>☕ +۵ در ثانیه</div><button id="boostPerSec">خرید (<span id="pricePerSec">۲۰</span>)</button></div>
+      <div class="ability-card"><div>⚡ +۱ کلیک</div><button id="boostClick">خرید (<span id="priceClick">۱۵</span>)</button></div>
+      <div class="ability-card"><div>⏱️ کاهش کول‌داون</div><button id="reduceCooldown">خرید (<span id="priceCooldown">۳۰</span>)</button></div>
+    </div>
+
+    <div class="reset-area"><button id="resetGameBtn">🔄 ریست بازی</button></div>
+  </div>
+
+  <!-- ===== تب لیدربورد ===== -->
+  <div id="tab-leaderboard" class="tab-content">
+    <div class="leaderboard">
+      <h3>🏆 برترین‌ها</h3>
+      <div id="leaderboardList"><div class="lb-item" style="justify-content:center;">در حال بارگذاری...</div></div>
+      <div class="my-rank hidden" id="myRank">رتبه شما: <strong id="rankNumber">-</strong> با <strong id="rankClicks">-</strong> کلیک</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    ★ داده‌ها در Redis ذخیره می‌شوند<br>
+    <a href="https://rubika.ir/@Coffee_Clicker" target="_blank">📱 کانال روبیکا: @Coffee_Clicker</a>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  // ================================================================
+  //  کلاینت – اتصال به سرور با Socket.io + Redis
+  // ================================================================
+
+  const socket = io();
+
+  // ---------- Device ID (یکتا برای هر مرورگر) ----------
+  function getDeviceId() {
+    let deviceId = localStorage.getItem('deviceId');
+    if (!deviceId) {
+      deviceId = crypto.randomUUID ? crypto.randomUUID() : 
+                 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('deviceId', deviceId);
+    }
+    return deviceId;
+  }
+  const deviceId = getDeviceId();
+
+  // ---------- وضعیت بازی (محلی) ----------
+  const COOLDOWN_SEC = 0.3;
+  const BASE_PRICE_PER_SEC = 20;
+  const BASE_PRICE_CLICK = 15;
+  const BASE_PRICE_COOLDOWN = 30;
+
+  let game = {
+    coffee: 0,
+    clickPower: 1,
+    cooldownMax: COOLDOWN_SEC,
+    cooldownCurrent: 0,
+    perSec: 0,
+    lastTick: Date.now(),
+    pricePerSec: BASE_PRICE_PER_SEC,
+    priceClick: BASE_PRICE_CLICK,
+    priceCooldown: BASE_PRICE_COOLDOWN,
+  };
+
+  let myUsername = null;
+  let isRegistered = false;
+
+  // ---------- DOM refs ----------
+  const registerArea = document.getElementById('register-area');
+  const usernameInput = document.getElementById('usernameInput');
+  const registerBtn = document.getElementById('registerBtn');
+  const registerError = document.getElementById('registerError');
+  const registeredInfo = document.getElementById('registeredInfo');
+  const displayName = document.getElementById('displayName');
+
+  const coffeeDisplay = document.getElementById('coffeeDisplay');
+  const clickPowerDisplay = document.getElementById('clickPowerDisplay');
+  const cooldownStatus = document.getElementById('cooldownStatus');
+  const coffeeBtn = document.getElementById('coffeeBtn');
+  const liquid = document.getElementById('liquid');
+
+  const boostPerSecBtn = document.getElementById('boostPerSec');
+  const boostClickBtn = document.getElementById('boostClick');
+  const reduceCooldownBtn = document.getElementById('reduceCooldown');
+  const resetBtn = document.getElementById('resetGameBtn');
+  const pricePerSecSpan = document.getElementById('pricePerSec');
+  const priceClickSpan = document.getElementById('priceClick');
+  const priceCooldownSpan = document.getElementById('priceCooldown');
+
+  const leaderboardList = document.getElementById('leaderboardList');
+  const myRankDiv = document.getElementById('myRank');
+  const rankNumber = document.getElementById('rankNumber');
+  const rankClicks = document.getElementById('rankClicks');
+
+  // ================================================================
+  //  Socket.io رویدادها
+  // ================================================================
+
+  socket.on('connect', () => {
+    console.log('✅ متصل به سرور');
+    socket.emit('identify', { deviceId });
+    socket.emit('getLeaderboard');
+  });
+
+  // ---- دریافت هویت ----
+  socket.on('identity', (data) => {
+    if (data && data.username) {
+      myUsername = data.username;
+      isRegistered = true;
+      game.coffee = data.clicks || 0;
+      registerArea.querySelector('h3').textContent = '👤 ثبت‌نام شده';
+      usernameInput.style.display = 'none';
+      registerBtn.style.display = 'none';
+      registerError.classList.remove('show');
+      registeredInfo.classList.remove('hidden');
+      displayName.textContent = myUsername;
+      document.querySelector('#register-area p').textContent = 'شما با این نام ثبت‌نام کرده‌اید.';
+      updateUI();
+    } else {
+      registerArea.querySelector('h3').textContent = '👤 ثبت‌نام با نام کاربری';
+      usernameInput.style.display = 'block';
+      registerBtn.style.display = 'block';
+      registeredInfo.classList.add('hidden');
+      document.querySelector('#register-area p').textContent = 'یک نام برای خود انتخاب کنید.';
+    }
+  });
+
+  // ---- ثبت‌نام ----
+  registerBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    if (!username || username.length < 2) {
+      registerError.textContent = 'نام کاربری باید حداقل ۲ کاراکتر باشد.';
+      registerError.classList.add('show');
+      return;
+    }
+    registerError.classList.remove('show');
+    socket.emit('register', { deviceId, username });
+  });
+
+  usernameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') registerBtn.click();
+  });
+
+  socket.on('registerSuccess', (data) => {
+    myUsername = data.username;
+    isRegistered = true;
+    game.coffee = data.clicks || 0;
+    registerArea.querySelector('h3').textContent = '✅ ثبت‌نام موفق';
+    usernameInput.style.display = 'none';
+    registerBtn.style.display = 'none';
+    registerError.classList.remove('show');
+    registeredInfo.classList.remove('hidden');
+    displayName.textContent = myUsername;
+    document.querySelector('#register-area p').textContent = 'شما با این نام ثبت‌نام کردید.';
+    updateUI();
+  });
+
+  socket.on('registerError', (msg) => {
+    registerError.textContent = msg;
+    registerError.classList.add('show');
+  });
+
+  // ---- لیدربورد ----
+  socket.on('leaderboardData', (data) => {
+    renderLeaderboard(data.leaderboard);
+  });
+
+  function renderLeaderboard(entries) {
+    leaderboardList.innerHTML = '';
+    if (!entries || entries.length === 0) {
+      leaderboardList.innerHTML = '<div class="lb-item" style="justify-content:center;">هنوز کسی ثبت‌نام نکرده</div>';
+      return;
+    }
+    for (let item of entries) {
+      const div = document.createElement('div');
+      div.className = 'lb-item';
+      div.innerHTML = `
+        <span>${item.username}</span>
+        <span class="clicks">☕ ${item.clicks}</span>
+      `;
+      leaderboardList.appendChild(div);
+    }
+    // رتبه‌ی کاربر فعلی
+    if (myUsername) {
+      const idx = entries.findIndex(e => e.username === myUsername);
+      if (idx !== -1) {
+        myRankDiv.classList.remove('hidden');
+        rankNumber.textContent = (idx + 1) + ' از ' + entries.length;
+        rankClicks.textContent = entries[idx].clicks;
+      } else {
+        myRankDiv.classList.add('hidden');
+      }
+    }
+  }
+
+  // ---- به‌روزرسانی امتیاز ----
+  socket.on('scoreUpdate', (data) => {
+    game.coffee = data.clicks;
+    updateUI();
+  });
+
+  // ================================================================
+  //  بازی محلی
+  // ================================================================
+
+  function saveGame() {
+    localStorage.setItem('coffee_offline', JSON.stringify(game));
+  }
+
+  function loadGame() {
+    const raw = localStorage.getItem('coffee_offline');
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw);
+        Object.assign(game, saved);
+        game.lastTick = Date.now();
+        return true;
+      } catch (e) {}
+    }
+    return false;
+  }
+
+  function updateLiquid() {
+    if (!liquid) return;
+    const fill = (game.coffee % 50) / 50;
+    const emptyY = 91, fullY = 61;
+    const topY = emptyY - (emptyY - fullY) * Math.min(fill + 0.06, 1);
+    liquid.setAttribute('d', `M36 ${topY.toFixed(1)} h63 v${(91 - topY).toFixed(1)} a31.5 31.5 0 0 1-31.5 31.5 A31.5 31.5 0 0 1 36 91 Z`);
+  }
+
+  function updateUI() {
+    coffeeDisplay.textContent = Math.floor(game.coffee);
+    clickPowerDisplay.textContent = game.clickPower;
+    if (game.cooldownCurrent > 0) {
+      cooldownStatus.textContent = `⏳ ${Math.ceil(game.cooldownCurrent * 10) / 10} ثانیه`;
+      coffeeBtn.classList.add('disabled');
+    } else {
+      cooldownStatus.textContent = '✅ آماده';
+      coffeeBtn.classList.remove('disabled');
+    }
+    pricePerSecSpan.textContent = game.pricePerSec;
+    priceClickSpan.textContent = game.priceClick;
+    priceCooldownSpan.textContent = game.priceCooldown;
+
+    boostPerSecBtn.disabled = (game.coffee < game.pricePerSec);
+    boostClickBtn.disabled = (game.coffee < game.priceClick);
+    reduceCooldownBtn.disabled = (game.coffee < game.priceCooldown || game.cooldownMax <= 0.05);
+
+    updateLiquid();
+    saveGame();
+  }
+
+  function gameTick() {
+    const now = Date.now();
+    const delta = (now - game.lastTick) / 1000;
+    game.lastTick = now;
+    if (game.cooldownCurrent > 0) {
+      game.cooldownCurrent = Math.max(0, game.cooldownCurrent - delta);
+    }
+    if (game.perSec > 0) {
+      game.coffee += game.perSec * delta;
+    }
+    game.coffee = Math.floor(game.coffee);
+    updateUI();
+    requestAnimationFrame(gameTick);
+  }
+
+  // ---------- کلیک اصلی ----------
+  function handleClick() {
+    if (!isRegistered) {
+      alert('لطفاً ابتدا ثبت‌نام کنید.');
+      return;
+    }
+    const now = Date.now() / 1000;
+    if (now - (game._lastClickTime || 0) < game.cooldownMax) return;
+    game._lastClickTime = now;
+
+    const gained = game.clickPower;
+    game.coffee += gained;
+    game.cooldownCurrent = game.cooldownMax;
+    updateUI();
+
+    // ارسال کلیک به سرور
+    socket.emit('addClicks', { count: gained });
+
+    // انیمیشن
+    const bean = document.createElement('div');
+    bean.textContent = '☕';
+    bean.style.cssText = 'position:fixed;font-size:22px;pointer-events:none;z-index:999;transition:all .8s ease-out;';
+    const rect = coffeeBtn.getBoundingClientRect();
+    bean.style.left = (rect.left + rect.width/2) + 'px';
+    bean.style.top = (rect.top + rect.height/2) + 'px';
+    document.body.appendChild(bean);
+    requestAnimationFrame(() => {
+      bean.style.transform = `translate(${Math.random()*60-30}px, -90px) rotate(180deg)`;
+      bean.style.opacity = '0';
+    });
+    setTimeout(() => bean.remove(), 800);
+  }
+
+  // ---------- خرید توانایی‌ها ----------
+  function buyPerSec() {
+    const price = game.pricePerSec;
+    if (game.coffee < price) return;
+    game.coffee -= price;
+    game.perSec += 5;
+    game.pricePerSec = Math.floor(price * 1.5);
+    updateUI();
+  }
+
+  function buyClick() {
+    const price = game.priceClick;
+    if (game.coffee < price) return;
+    game.coffee -= price;
+    game.clickPower += 1;
+    game.priceClick = Math.floor(price * 1.5);
+    updateUI();
+  }
+
+  function buyCooldown() {
+    const price = game.priceCooldown;
+    if (game.coffee < price) return;
+    if (game.cooldownMax <= 0.05) { alert('کول‌داون به حداقل رسیده!'); return; }
+    game.coffee -= price;
+    game.cooldownMax = Math.max(0.05, game.cooldownMax - 0.05);
+    game.priceCooldown = Math.floor(price * 1.5);
+    if (game.cooldownCurrent > game.cooldownMax) game.cooldownCurrent = game.cooldownMax;
+    updateUI();
+  }
+
+  function resetGame() {
+    if (!confirm('آیا از ریست کردن بازی مطمئنید؟')) return;
+    localStorage.removeItem('coffee_offline');
+    game = {
+      coffee: 0,
+      clickPower: 1,
+      cooldownMax: COOLDOWN_SEC,
+      cooldownCurrent: 0,
+      perSec: 0,
+      lastTick: Date.now(),
+      pricePerSec: BASE_PRICE_PER_SEC,
+      priceClick: BASE_PRICE_CLICK,
+      priceCooldown: BASE_PRICE_COOLDOWN,
+    };
+    // ریست در سرور
+    socket.emit('addClicks', { count: -game.coffee });
+    updateUI();
+  }
+
+  // ================================================================
+  //  تب‌ها
+  // ================================================================
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ================================================================
+  //  مقداردهی اولیه
+  // ================================================================
+  loadGame();
+  updateUI();
+
+  coffeeBtn.addEventListener('click', handleClick);
+  boostPerSecBtn.addEventListener('click', buyPerSec);
+  boostClickBtn.addEventListener('click', buyClick);
+  reduceCooldownBtn.addEventListener('click', buyCooldown);
+  resetBtn.addEventListener('click', resetGame);
+
+  game.lastTick = Date.now();
+  requestAnimationFrame(gameTick);
+
+  socket.emit('getLeaderboard');
+</script>
+</body>
+</html>
